@@ -6,8 +6,10 @@ chrome.action.onClicked.addListener((tab) => {
 });
 
 function unblock() {
-  document.body.style.setProperty('overflow', 'auto', 'important');
-  document.body.style.setProperty('overflow-y', 'auto', 'important');
+  for (let node of [document.body, document.body.parentNode]) {
+    node.style.setProperty('overflow', 'auto', 'important');
+    node.style.setProperty('overflow-y', 'auto', 'important');
+  }
   let elements = [...document.body.childNodes];
   while (elements.length) {
     let next = elements.shift();
@@ -15,6 +17,9 @@ function unblock() {
     if (!document.body.contains(next)) { continue; }
     elements.push(...next.childNodes);
     let style = getComputedStyle(next);
+    if (style.filter.match(/blur/)) { 
+      next.style.setProperty('filter', 'none', 'important'); 
+    }
     if (style['position'] !== 'fixed') { continue; }
     let rect = next.getBoundingClientRect();
     if (rect.width/window.innerWidth < 0.9) { continue; }
